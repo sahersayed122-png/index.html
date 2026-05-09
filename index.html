@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omarino Store - متجر عمرينو</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, 'Cairo', sans-serif;
+            transition: background 0.3s ease, color 0.2s;
+        }
+        body.light-mode {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            color: #0f172a;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        body.dark-mode .glass-card {
+            background: rgba(30,41,59,0.6);
+        }
+        .navbar {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(12px);
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        body.dark-mode .navbar {
+            background: rgba(15,23,42,0.8);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-buttons button, .lang-btn {
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+        }
+        .user-badge {
+            background: rgba(0,0,0,0.05);
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        .main-feed { flex: 2; min-width: 280px; }
+        .sidebar { flex: 1; min-width: 260px; }
+        .product-media {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 1rem;
+        }
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .reaction-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            border-top: 1px solid #ccc;
+            padding-top: 0.5rem;
+        }
+        .like-btn, .dislike-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .like-btn i { color: #ef4444; }
+        .dislike-btn i { color: #94a3b8; }
+        .rating-stars { display: flex; gap: 3px; margin: 5px 0; }
+        .star { cursor: pointer; color: #cbd5e1; }
+        .star.active { color: #facc15; }
+        .comments-section { margin-top: 0.8rem; }
+        .comment-item {
+            background: rgba(0,0,0,0.05);
+            border-radius: 1rem;
+            padding: 0.3rem 0.6rem;
+            margin-bottom: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .add-comment { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .add-comment input { flex: 1; padding: 0.4rem; border-radius: 2rem; border: none; }
+        .search-input { width: 100%; padding: 0.6rem; border-radius: 2rem; border: none; margin-bottom: 1rem; }
+        .follow-btn, .btn-primary {
+            background: #3b82f6;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+        }
+        .theme-toggle-fab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #0f172a;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 18px;
+            z-index: 99;
+            cursor: pointer;
+        }
+        body.dark-mode .theme-toggle-fab {
+            background: #facc15;
+            color: black;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            font-size: 0.85rem;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 800px) { .container { flex-direction: column; } }
+    </style>
+</head>
+<body class="light-mode">
+<div class="navbar">
+    <div class="logo"><i class="fas fa-store"></i> <span data-key="storeName">Omarino Store</span></div>
+    <div class="nav-buttons">
+        <button id="homeNavBtn"><i class="fas fa-home"></i> <span data-key="home">الرئيسية</span></button>
+        <button id="searchNavBtn"><i class="fas fa-search"></i> <span data-key="search">بحث</span></button>
+        <button id="langToggleBtn" class="lang-btn"><i class="fas fa-globe"></i> English</button>
+        <div class="user-badge" id="userBadge">
+            <span id="navUsername"></span>
+            <button id="logoutBtn" style="background:#ef4444; color:white;"><span data-key="logout">خروج</span></button>
+        </div>
+    </div>
+</div>
+<div class="container" id="appContainer"></div>
+<button class="theme-toggle-fab" id="themeToggle"><i class="fas fa-moon"></i> <span data-key="theme">تبديل الوضع</span></button>
+<footer id="mainFooter">
+    <div>© 2025 Omarino Store | <span data-key="devBy">طور بواسطة</span> <strong>عمر ياسر عمر (Omar Yasser Omar)</strong></div>
+    <div><i class="fas fa-phone"></i> <span data-key="contact">للتواصل</span>: 01129609053</div>
+</footer>
+
+<script>
+    // ---------- البيانات الأساسية (محملة من السيرفر) ----------
+    const API_URL = ''; // استخدام رابط نسبي لأن السيرفر يخدم الملفات
+    let users = [];
+    let products = [];
+    let follows = [];
+    let likesDislikes = [];
+    
+    let currentUser = null;
+    let currentView = 'home';
+    let profileUserId = null;
+    let currentLang = 'ar';
+    
+    const avatarColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec489a'];
+    
+    const translations = {
+        ar: {
+            storeName: "Omarino Store",
+            home: "الرئيسية",
+            search: "بحث",
+            logout: "خروج",
+            theme: "تبديل الوضع",
+            devBy: "طور بواسطة",
+            contact: "للتواصل",
+            addProduct: "أضف منتجك",
+            productName: "اسم المنتج",
+            price: "السعر",
+            details: "تفاصيل المنتج",
+            mediaType: "نوع الوسائط",
+            image: "صورة",
+            video: "فيديو",
+            uploadFile: "اختر ملف (صورة/فيديو)",
+            orLink: "أو رابط خارجي",
+            publish: "نشر المنتج",
+            products: "المنتجات",
+            noProducts: "لا توجد منتجات",
+            followers: "متابعون",
+            avgRating: "متوسط التقييم",
+            comments: "تعليقات",
+            writeComment: "اكتب تعليقاً...",
+            follow: "متابعة",
+            unfollow: "إلغاء المتابعة",
+            backHome: "← العودة للرئيسية",
+            searchUser: "ابحث عن مستخدم...",
+            noResults: "لا توجد نتائج",
+            login: "تسجيل الدخول",
+            register: "إنشاء حساب جديد",
+            username: "اسم المستخدم",
+            password: "كلمة المرور",
+            adminCode: "كود الأدمن (اختياري)",
+            phoneOptional: "رقم الهاتف (اختياري)",
+            alreadyExists: "اسم المستخدم موجود بالفعل",
+            fillFields: "املأ جميع الحقول",
+            loginSuccess: "مرحباً",
+            profile: "الملف الشخصي",
+            editPhone: "تحديث رقم الهاتف",
+            phoneUpdated: "تم تحديث الرقم"
+        },
+        en: {
+            storeName: "Omarino Store",
+            home: "Home",
+            search: "Search",
+            logout: "Logout",
+            theme: "Toggle Theme",
+            devBy: "Developed by",
+            contact: "Contact",
+            addProduct: "Add Your Product",
+            productName: "Product Name",
+            price: "Price (EGP)",
+            details: "Product Details",
+            mediaType: "Media Type",
+            image: "Image",
+            video: "Video",
+            uploadFile: "Upload file (image/video)",
+            orLink: "Or external link",
+            publish: "Publish Product",
+            products: "Products",
+            noProducts: "No products yet",
+            followers: "Followers",
+            avgRating: "Avg Rating",
+            comments: "Comments",
+            writeComment: "Write a comment...",
+            follow: "Follow",
+            unfollow: "Unfollow",
+            backHome: "← Back to Home",
+            searchUser: "Search for users...",
+            noResults: "No results",
+            login: "Login",
+            register: "Create New Account",
+            username: "Username",
+            password: "Password",
+            adminCode: "Admin code (optional)",
+            phoneOptional: "Phone number (optional)",
+            alreadyExists: "Username already exists",
+            fillFields: "Please fill all fields",
+            loginSuccess: "Welcome",
+            profile: "Profile",
+            editPhone: "Update Phone",
+            phoneUpdated: "Phone updated"
+        }
+    };
+    
+    function t(key) {
+        return translations[currentLang][key] || key;
+    }
+    
+    function updatePageLanguage() {
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if(key && translations[currentLang][key]) el.innerText = translations[currentLang][key];
+        });
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        if (langToggleBtn) {
+            langToggleBtn.innerHTML = currentLang === 'ar' ? '<i class="fas fa-globe"></i> English' : '<i class="fas fa-globe"></i> العربية';
+        }
+        document.title = currentLang === 'ar' ? "Omarino Store - متجر عمرينو" : "Omarino Store";
+        renderCurrentView();
+    }
+    
+    // ---------- جلب البيانات من السيرفر ----------
+    async function loadData() {
+        try {
+            const [usersRes, productsRes, followsRes] = await Promise.all([
+                fetch(`${API_URL}/api/users`),
+                fetch(`${API_URL}/api/products`),
+                fetch(`${API_URL}/api/follows`)
+            ]);
+            users = await usersRes.json();
+            products = await productsRes.json();
+            follows = await followsRes.json();
+            
+            // جلب التفاعلات لكل منتج
+            for (let prod of products) {
+                const reactionsRes = await fetch(`${API_URL}/api/reactions/${prod.id}`);
+                const productReactions = await reactionsRes.json();
+                likesDislikes = likesDislikes.filter(r => r.productId !== prod.id).concat(productReactions);
+            }
+
+            const session = localStorage.getItem('omarino_currentUser');
+            if(session) currentUser = JSON.parse(session);
+        } catch (e) {
+            console.error("Error loading data:", e);
+        }
+        renderCurrentView();
+    }
+
+    // ---------- دوال المساعدة ----------
+    function getUserById(id) { return users.find(u => u.id === id); }
+    
+    function isFollowing(followerId, followingId) {
+        return follows.some(f => f.followerId === followerId && f.followingId === followingId);
+    }
+    
+    async function followUser(followerId, followingId) {
+        if(followerId === followingId) return;
+        await fetch(`${API_URL}/api/follow`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ followerId, followingId })
+        });
+        await loadData();
+    }
+    
+    async function unfollowUser(followerId, followingId) {
+        await followUser(followerId, followingId); // نفس الـ endpoint يقوم بالتبديل (toggle)
+    }
+    
+    function getSuggestedUsers() {
+        if(!currentUser) return [];
+        const followingIds = follows.filter(f => f.followerId === currentUser.id).map(f => f.followingId);
+        return users.filter(u => u.id !== currentUser.id && !followingIds.includes(u.id) && !u.isAdmin);
+    }
+    
+    function getOrderedProducts() {
+        if(!currentUser) return [...products].sort((a,b)=> b.createdAt - a.createdAt);
+        const followingIds = follows.filter(f => f.followerId === currentUser.id).map(f => f.followingId);
+        const followingProducts = products.filter(p => followingIds.includes(p.sellerId));
+        const otherProducts = products.filter(p => !followingIds.includes(p.sellerId) && p.sellerId !== currentUser.id);
+        const myProducts = products.filter(p => p.sellerId === currentUser.id);
+        const sortByDate = arr => [...arr].sort((a,b)=> b.createdAt - a.createdAt);
+        return [...sortByDate(followingProducts), ...sortByDate(myProducts), ...sortByDate(otherProducts)];
+    }
+    
+    function getLikesCount(productId) { return likesDislikes.filter(l => l.productId === productId && l.type === 'like').length; }
+    function getDislikesCount(productId) { return likesDislikes.filter(l => l.productId === productId && l.type === 'dislike').length; }
+    function getReaction(productId, userId) {
+        const r = likesDislikes.find(l => l.productId === productId && l.userId === userId);
+        return r ? r.type : null;
+    }
+    
+    async function setReaction(productId, type) {
+        if(!currentUser) return;
+        await fetch(`${API_URL}/api/products/${productId}/react`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, type })
+        });
+        await loadData();
+    }
+    
+    async function setRating(productId, stars) {
+        if(!currentUser) return;
+        await fetch(`${API_URL}/api/products/${productId}/rate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, stars })
+        });
+        await loadData();
+    }
+    
+    function getAverageRating(product) {
+        if(!product.ratings || product.ratings.length === 0) return 0;
+        const sum = product.ratings.reduce((a,b)=> a + b.stars, 0);
+        return sum / product.ratings.length;
+    }
+    
+    function getUserRating(product) {
+        if(!currentUser || !product.ratings) return 0;
+        const r = product.ratings.find(r => r.userId === currentUser.id);
+        return r ? r.stars : 0;
+    }
+    
+    async function addComment(productId, text) {
+        if(!currentUser || !text.trim()) return;
+        await fetch(`${API_URL}/api/products/${productId}/comment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.id, text: text.trim() })
+        });
+        await loadData();
+    }
+    
+    async function deleteComment(commentId) {
+        if(!currentUser?.isAdmin) return;
+        await fetch(`${API_URL}/api/comments/${commentId}`, { method: 'DELETE' });
+        await loadData();
+    }
+    
+    async function deleteProduct(productId) {
+        if(!currentUser?.isAdmin) return;
+        await fetch(`${API_URL}/api/products/${productId}`, { method: 'DELETE' });
+        await loadData();
+    }
+    
+    let selectedFileBase64 = null, selectedFileType = null;
+    async function publishProduct(name, price, desc, mediaType, mediaUrl, fileBase64, fileType) {
+        if(!currentUser) return;
+        let finalUrl = fileBase64 || mediaUrl;
+        let finalType = fileBase64 ? fileType : mediaType;
+        if(!name || !price || price<=0 || !finalUrl) { alert(t('fillFields')); return; }
+        
+        await fetch(`${API_URL}/api/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sellerId: currentUser.id,
+                name, price: Number(price), desc: desc || "",
+                mediaType: finalType, mediaDataURL: finalUrl
+            })
+        });
+        await loadData();
+    }
+    
+    function searchUsers(query) {
+        if(!query.trim()) return [];
+        return users.filter(u => u.username.toLowerCase().includes(query.trim().toLowerCase()) && u.id !== currentUser?.id);
+    }
+    
+    function getFollowersCount(userId) {
+        return follows.filter(f => f.followingId === userId).length;
+    }
+    
+    function getUserAvgRating(userId) {
+        const userProducts = products.filter(p => p.sellerId === userId);
+        if(userProducts.length === 0) return 0;
+        let total = 0, count = 0;
+        userProducts.forEach(p => {
+            if(p.ratings && p.ratings.length) {
+                const sum = p.ratings.reduce((a,b)=> a + b.stars, 0);
+                total += sum;
+                count += p.ratings.length;
+            }
+        });
+        return count === 0 ? 0 : total / count;
+    }
+    
+    async function updateUserPhone(phone) {
+        if(!currentUser) return;
+        await fetch(`${API_URL}/api/users/${currentUser.id}/phone`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone })
+        });
+        currentUser.phone = phone;
+        localStorage.setItem('omarino_currentUser', JSON.stringify(currentUser));
+        alert(t('phoneUpdated'));
+        await loadData();
+    }
+    
+    // ---------- واجهة المستخدم ----------
+    function renderCurrentView() {
+        const container = document.getElementById('appContainer');
+        if(!container) return;
+        if(!currentUser) { renderAuthScreen(container); return; }
+        
+        const navUsername = document.getElementById('navUsername');
+        if (navUsername) {
+            navUsername.innerHTML = `${currentUser.username} ${currentUser.isAdmin ? '⭐' : ''}`;
+        }
+        
+        if(currentView === 'home') renderHome(container);
+        else if(currentView === 'profile') renderProfile(container, profileUserId);
+        else if(currentView === 'search') renderSearch(container);
+    }
+    
+    function renderAuthScreen(container) {
+        container.innerHTML = `
+            <div style="max-width:450px; margin:auto; width:100%;">
+                <div class="glass-card" style="margin-bottom:1rem;">
+                    <h3>🔐 ${t('login')}</h3>
+                    <input type="text" id="loginUsername" class="search-input" placeholder="${t('username')}">
+                    <input type="password" id="loginPassword" class="search-input" placeholder="${t('password')}">
+                    <div style="margin:10px 0;">
+                        <label>🔑 ${t('adminCode')}:</label>
+                        <input type="password" id="adminCode" class="search-input">
+                    </div>
+                    <button id="doLoginBtn" class="btn-primary" style="width:100%">${t('login')}</button>
+                </div>
+                <div class="glass-card">
+                    <h3>📝 ${t('register')}</h3>
+                    <input type="text" id="regUsername" class="search-input" placeholder="${t('username')}">
+                    <input type="password" id="regPassword" class="search-input" placeholder="${t('password')}">
+                    <input type="tel" id="regPhone" class="search-input" placeholder="${t('phoneOptional')}">
+                    <button id="doRegisterBtn" class="btn-primary" style="width:100%">${t('register')}</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('doLoginBtn')?.addEventListener('click', async () => {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const adminCode = document.getElementById('adminCode').value.trim();
+            
+            try {
+                const res = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, adminCode })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('omarino_currentUser', JSON.stringify(currentUser));
+                    await loadData();
+                } else {
+                    alert("بيانات غير صحيحة");
+                }
+            } catch (e) {
+                alert("حدث خطأ أثناء تسجيل الدخول");
+            }
+        });
+        document.getElementById('doRegisterBtn')?.addEventListener('click', async () => {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            if(!username || !password) { alert(t('fillFields')); return; }
+            
+            try {
+                const res = await fetch(`${API_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, phone, avatarColor: avatarColors[Math.floor(Math.random()*avatarColors.length)] })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(t('loginSuccess'));
+                    // بعد التسجيل، يمكنه تسجيل الدخول تلقائياً أو الطلب منه تسجيل الدخول
+                    document.getElementById('loginUsername').value = username;
+                    document.getElementById('loginPassword').value = password;
+                    document.getElementById('doLoginBtn').click();
+                } else {
+                    alert(data.message || "فشل التسجيل");
+                }
+            } catch (e) {
+                alert("حدث خطأ أثناء التسجيل");
+            }
+        });
+    }
+    
+    function renderHome(container) {
+        const ordered = getOrderedProducts();
+        const suggestions = getSuggestedUsers();
+        const addProductHtml = `
+            <div class="glass-card">
+                <h3><i class="fas fa-plus"></i> ${t('addProduct')}</h3>
+                <input type="text" id="newProdName" class="search-input" placeholder="${t('productName')}">
+                <input type="number" id="newProdPrice" class="search-input" placeholder="${t('price')}">
+                <textarea id="newProdDesc" rows="2" placeholder="${t('details')}" style="width:100%; border-radius:1rem; padding:10px; border:none; background:rgba(0,0,0,0.05); margin-bottom:1rem;"></textarea>
+                <select id="mediaTypeSelect" class="search-input"><option value="image">${t('image')}</option><option value="video">${t('video')}</option></select>
+                <div id="fileUploadTrigger" style="background:rgba(0,0,0,0.05); padding:0.5rem; border-radius:2rem; text-align:center; cursor:pointer; margin:0.5rem 0;">
+                    📁 ${t('uploadFile')} <input type="file" id="productFile" accept="image/*,video/*" style="display:none;">
+                </div>
+                <small id="fileNameDisplay"></small>
+                <input type="text" id="mediaUrlInput" class="search-input" placeholder="${t('orLink')}">
+                <button id="publishBtn" class="btn-primary" style="width:100%">${t('publish')}</button>
+            </div>
+        `;
+        let productsHtml = `<div class="glass-card"><h2>🏠 ${t('products')}</h2></div>`;
+        if(ordered.length === 0) productsHtml += `<div class="glass-card">${t('noProducts')}</div>`;
+        ordered.forEach(prod => {
+            const seller = getUserById(prod.sellerId);
+            if(!seller) return;
+            const avgRating = getAverageRating(prod);
+            const userRating = getUserRating(prod);
+            const likes = getLikesCount(prod.id);
+            const dislikes = getDislikesCount(prod.id);
+            const userReaction = getReaction(prod.id, currentUser.id);
+            const starsHtml = `<div class="rating-stars" data-prodid="${prod.id}">${[1,2,3,4,5].map(i => `<i class="fas fa-star star ${i<=userRating ? 'active' : ''}" data-val="${i}"></i>`).join('')}</div><span>⭐ ${avgRating.toFixed(1)} (${prod.ratings?.length||0})</span>`;
+            const commentsHtml = `<div class="comments-section"><div class="comment-list">${(prod.comments||[]).map((c) => `<div class="comment-item"><span><strong>${getUserById(c.userId)?.username || 'User'}</strong>: ${escapeHtml(c.text)}</span> ${currentUser?.isAdmin ? `<button class="delCommentBtn" data-cid="${c.id}">🗑️</button>` : ''}</div>`).join('') || '<div>لا تعليقات</div>'}</div><div class="add-comment"><input type="text" id="commentTxt-${prod.id}" placeholder="${t('writeComment')}"><button class="addCommentBtn" data-pid="${prod.id}"><i class="fas fa-paper-plane"></i></button></div></div>`;
+            productsHtml += `
+                <div class="glass-card product-card">
+                    ${currentUser?.isAdmin ? `<button class="delProductBtn" data-pid="${prod.id}" style="background:#ef4444;float:left;padding:2px 8px;border-radius:20px; color:white; border:none; cursor:pointer;">حذف</button>` : ''}
+                    <div class="seller-info" style="display:flex; align-items:center; gap:10px;">
+                        <div class="avatar" style="background:${seller.avatarColor}">${seller.username[0]}</div>
+                        <div><button class="profileLink" data-uid="${seller.id}" style="background:none;border:none;font-weight:bold;cursor:pointer; color:inherit; font-size:1.1rem;">${seller.username} ${seller.isAdmin ? '⭐' : ''}</button></div>
+                    </div>
+                    ${prod.mediaType === 'image' ? `<img class="product-media" src="${prod.mediaDataURL}" onerror="this.src='https://via.placeholder.com/400'">` : `<video class="product-media" src="${prod.mediaDataURL}" controls></video>`}
+                    <h3>${escapeHtml(prod.name)}</h3>
+                    <div>💰 ${prod.price.toLocaleString()} ج.م</div>
+                    <div style="margin: 0.5rem 0;">${escapeHtml(prod.desc)}</div>
+                    <div class="rating-stars-container" style="display:flex; align-items:center; gap:10px;">${starsHtml}</div>
+                    <div class="reaction-buttons">
+                        <button class="like-btn ${userReaction === 'like' ? 'active' : ''}" data-pid="${prod.id}" data-type="like" style="color:${userReaction === 'like' ? '#ef4444' : 'inherit'}"><i class="fas fa-thumbs-up"></i> ${likes}</button>
+                        <button class="dislike-btn ${userReaction === 'dislike' ? 'active' : ''}" data-pid="${prod.id}" data-type="dislike" style="color:${userReaction === 'dislike' ? '#94a3b8' : 'inherit'}"><i class="fas fa-thumbs-down"></i> ${dislikes}</button>
+                    </div>
+                    ${commentsHtml}
+                </div>
+            `;
+        });
+        let suggestionsHtml = `<div class="glass-card"><h4>👥 ${t('followers')} مقترحين</h4><ul>`;
+        suggestions.slice(0,6).forEach(sug => {
+            suggestionsHtml += `<li style="display:flex;justify-content:space-between;margin:8px 0; align-items:center;"><button class="profileLink" data-uid="${sug.id}" style="background:none; border:none; cursor:pointer; color:inherit;">${sug.username}</button><button class="followSuggestionBtn btn-primary" data-uid="${sug.id}" style="padding:2px 10px; font-size:0.8rem;">${t('follow')}</button></li>`;
+        });
+        suggestionsHtml += `</ul></div><div class="glass-card"><h4>📱 ${t('editPhone')}</h4><input type="tel" id="userPhoneInput" class="search-input" placeholder="${t('phoneOptional')}" value="${currentUser.phone || ''}"><button id="updatePhoneBtn" class="btn-primary" style="width:100%">${t('editPhone')}</button></div>`;
+        container.innerHTML = `<div class="main-feed">${addProductHtml}${productsHtml}</div><div class="sidebar">${suggestionsHtml}</div>`;
+        
+        // ربط الأحداث
+        document.getElementById('publishBtn')?.addEventListener('click', async () => {
+            const name = document.getElementById('newProdName').value.trim();
+            const price = parseFloat(document.getElementById('newProdPrice').value);
+            const desc = document.getElementById('newProdDesc').value.trim();
+            const mediaType = document.getElementById('mediaTypeSelect').value;
+            const url = document.getElementById('mediaUrlInput').value.trim();
+            await publishProduct(name, price, desc, mediaType, url, selectedFileBase64, selectedFileType);
+            selectedFileBase64 = null;
+        });
+        document.getElementById('fileUploadTrigger')?.addEventListener('click', () => document.getElementById('productFile').click());
+        document.getElementById('productFile')?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = ev => { selectedFileBase64 = ev.target.result; selectedFileType = file.type.startsWith('image/') ? 'image' : 'video'; document.getElementById('fileNameDisplay').innerText = `✓ ${file.name}`; };
+                reader.readAsDataURL(file);
+            }
+        });
+        document.getElementById('updatePhoneBtn')?.addEventListener('click', () => {
+            const phone = document.getElementById('userPhoneInput').value.trim();
+            updateUserPhone(phone);
+        });
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', async (e) => {
+                const stars = parseInt(star.getAttribute('data-val'));
+                const prodId = parseInt(star.closest('.rating-stars').getAttribute('data-prodid'));
+                await setRating(prodId, stars);
+            });
+        });
+        document.querySelectorAll('.like-btn, .dislike-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const pid = parseInt(btn.getAttribute('data-pid'));
+                const type = btn.getAttribute('data-type');
+                await setReaction(pid, type);
+            });
+        });
+        document.querySelectorAll('.addCommentBtn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const pid = parseInt(btn.getAttribute('data-pid'));
+                const input = document.getElementById(`commentTxt-${pid}`);
+                if(input) await addComment(pid, input.value);
+            });
+        });
+        document.querySelectorAll('.delCommentBtn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const cid = parseInt(btn.getAttribute('data-cid'));
+                await deleteComment(cid);
+            });
+        });
+        document.querySelectorAll('.delProductBtn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if(confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
+                    await deleteProduct(parseInt(btn.getAttribute('data-pid')));
+                }
+            });
+        });
+        document.querySelectorAll('.profileLink').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const uid = parseInt(btn.getAttribute('data-uid'));
+                profileUserId = uid;
+                currentView = 'profile';
+                renderCurrentView();
+            });
+        });
+        document.querySelectorAll('.followSuggestionBtn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const uid = parseInt(btn.getAttribute('data-uid'));
+                await followUser(currentUser.id, uid);
+            });
+        });
+    }
+    
+    function renderProfile(container, userId) {
+        const user = getUserById(userId);
+        if(!user) { container.innerHTML = '<div class="glass-card">مستخدم غير موجود</div>'; return; }
+        const userProducts = products.filter(p => p.sellerId === userId).sort((a,b)=>b.createdAt - a.createdAt);
+        const isCurrent = currentUser.id === userId;
+        const following = isFollowing(currentUser.id, userId);
+        const followersCount = getFollowersCount(userId);
+        const userAvgRating = getUserAvgRating(userId);
+        let followButton = '';
+        if(!isCurrent && !user.isAdmin) {
+            followButton = `<button id="profileFollowBtn" class="follow-btn" style="background:${following ? '#94a3b8' : '#3b82f6'}; color:white; border:none; padding:8px 20px; border-radius:40px; cursor:pointer;">${following ? t('unfollow') : t('follow')}</button>`;
+        }
+        let productsHtml = `<div class="glass-card"><h3>📦 ${t('products')} (${userProducts.length})</h3></div>`;
+        if(userProducts.length === 0) productsHtml += `<div class="glass-card">${t('noProducts')}</div>`;
+        userProducts.forEach(prod => {
+            const likes = getLikesCount(prod.id);
+            const dislikes = getDislikesCount(prod.id);
+            const userReaction = getReaction(prod.id, currentUser.id);
+            productsHtml += `
+                <div class="glass-card product-card">
+                    ${prod.mediaType === 'image' ? `<img class="product-media" src="${prod.mediaDataURL}">` : `<video class="product-media" src="${prod.mediaDataURL}" controls></video>`}
+                    <h3>${escapeHtml(prod.name)}</h3>
+                    <div>💰 ${prod.price} ج.م</div>
+                    <div style="margin:0.5rem 0;">${escapeHtml(prod.desc)}</div>
+                    <div class="reaction-buttons">
+                        <button class="like-btn" data-pid="${prod.id}" data-type="like" style="color:${userReaction === 'like' ? '#ef4444' : 'inherit'}"><i class="fas fa-thumbs-up"></i> ${likes}</button>
+                        <button class="dislike-btn" data-pid="${prod.id}" data-type="dislike" style="color:${userReaction === 'dislike' ? '#94a3b8' : 'inherit'}"><i class="fas fa-thumbs-down"></i> ${dislikes}</button>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = `
+            <div style="width:100%; max-width:800px; margin:auto;">
+                <div class="glass-card" style="text-align:center;">
+                    <div class="avatar" style="width:100px;height:100px;font-size:3rem;margin:0 auto;background:${user.avatarColor}">${user.username[0]}</div>
+                    <h2 style="margin-top:1rem;">${user.username} ${user.isAdmin ? '⭐' : ''}</h2>
+                    <div class="profile-stats" style="justify-content:center; margin:1rem 0;">
+                        <span><i class="fas fa-users"></i> ${t('followers')}: ${followersCount}</span>
+                        <span><i class="fas fa-star"></i> ${t('avgRating')}: ${userAvgRating.toFixed(1)}</span>
+                    </div>
+                    ${followButton}
+                    ${isCurrent ? `<div style="margin-top:1.5rem;"><label>${t('editPhone')}:</label><input type="tel" id="profilePhoneInput" class="search-input" placeholder="${t('phoneOptional')}" value="${user.phone || ''}"><button id="updateProfilePhoneBtn" class="btn-primary" style="width:100%">${t('editPhone')}</button></div>` : user.phone ? `<div style="margin-top:1rem;"><i class="fas fa-phone"></i> ${user.phone}</div>` : ''}
+                </div>
+                ${productsHtml}
+                <button id="backHome" class="btn-primary" style="margin-top:1rem; width:100%;">← ${t('backHome')}</button>
+            </div>
+        `;
+        if(followButton) document.getElementById('profileFollowBtn')?.addEventListener('click', async () => {
+            await followUser(currentUser.id, userId);
+        });
+        if(isCurrent) {
+            document.getElementById('updateProfilePhoneBtn')?.addEventListener('click', () => {
+                const phone = document.getElementById('profilePhoneInput').value.trim();
+                updateUserPhone(phone);
+            });
+        }
+        document.getElementById('backHome')?.addEventListener('click', () => {
+            currentView = 'home';
+            renderCurrentView();
+        });
+        document.querySelectorAll('.like-btn, .dislike-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const pid = parseInt(btn.getAttribute('data-pid'));
+                const type = btn.getAttribute('data-type');
+                await setReaction(pid, type);
+            });
+        });
+    }
+    
+    function renderSearch(container) {
+        container.innerHTML = `<div class="main-feed"><div class="glass-card"><input type="text" id="searchUserInput" class="search-input" placeholder="${t('searchUser')}"><div id="searchResults"></div></div></div><div class="sidebar"></div>`;
+        const input = document.getElementById('searchUserInput');
+        const resultsDiv = document.getElementById('searchResults');
+        const updateSearch = () => {
+            const results = searchUsers(input.value);
+            if(results.length === 0) { resultsDiv.innerHTML = `<div class="glass-card">${t('noResults')}</div>`; return; }
+            resultsDiv.innerHTML = `<div class="glass-card"><ul>${results.map(u => {
+                const following = isFollowing(currentUser.id, u.id);
+                return `<li style="display:flex;justify-content:space-between;margin:8px 0; align-items:center;"><button class="profileLink" data-uid="${u.id}" style="background:none; border:none; cursor:pointer; color:inherit; font-weight:bold;">${u.username}</button><button class="followSearchBtn btn-primary" data-uid="${u.id}" style="padding:4px 12px; font-size:0.9rem; background:${following ? '#94a3b8' : '#3b82f6'}">${following ? t('unfollow') : t('follow')}</button></li>`;
+            }).join('')}</ul></div>`;
+            document.querySelectorAll('.profileLink').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const uid = parseInt(btn.getAttribute('data-uid'));
+                    profileUserId = uid;
+                    currentView = 'profile';
+                    renderCurrentView();
+                });
+            });
+            document.querySelectorAll('.followSearchBtn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const uid = parseInt(btn.getAttribute('data-uid'));
+                    await followUser(currentUser.id, uid);
+                });
+            });
+        };
+        input.addEventListener('input', updateSearch);
+        updateSearch();
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    
+    function initTheme() {
+        const saved = localStorage.getItem('omarino_theme');
+        if(saved === 'dark') { document.body.classList.add('dark-mode'); document.body.classList.remove('light-mode'); }
+        else { document.body.classList.add('light-mode'); document.body.classList.remove('dark-mode'); }
+    }
+    
+    function toggleTheme() {
+        if(document.body.classList.contains('light-mode')) {
+            document.body.classList.add('dark-mode'); document.body.classList.remove('light-mode');
+            localStorage.setItem('omarino_theme', 'dark');
+        } else {
+            document.body.classList.add('light-mode'); document.body.classList.remove('dark-mode');
+            localStorage.setItem('omarino_theme', 'light');
+        }
+    }
+    
+    document.getElementById('homeNavBtn')?.addEventListener('click', () => { currentView = 'home'; renderCurrentView(); });
+    document.getElementById('searchNavBtn')?.addEventListener('click', () => { currentView = 'search'; renderCurrentView(); });
+    document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; localStorage.removeItem('omarino_currentUser'); renderCurrentView(); });
+    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+    document.getElementById('langToggleBtn')?.addEventListener('click', () => {
+        currentLang = currentLang === 'ar' ? 'en' : 'ar';
+        updatePageLanguage();
+    });
+    
+    // التشغيل الأول
+    loadData();
+    initTheme();
+    updatePageLanguage();
+</script>
+
+</body>
+</html>
